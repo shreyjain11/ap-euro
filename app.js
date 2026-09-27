@@ -1,7 +1,7 @@
-import { parseGlossary, shuffle, isCorrect, validateSavedSet } from './core.js';
+import { shuffle, isCorrect } from './core.js';
+import { periods } from './periods.js';
 
 const $ = id => document.getElementById(id);
-const STORAGE_KEY = 'ap-euro.study-set.v1';
 let studySet = null;
 let round = [];
 let options = [];
@@ -13,19 +13,40 @@ const direction = () => $('direction').value;
 const answerText = entry => direction() === 'definition' ? entry.word : entry.definition;
 
 function notice(text) { $('notice').textContent = text; }
-function loadSet() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (!validateSavedSet(parsed)) throw new Error('invalid');
-      studySet = parsed;
-    }
-  } catch { notice('Your saved set could not be loaded. Paste it again to start a new session.'); }
-  $('empty').hidden = Boolean(studySet);
-  $('study').hidden = !studySet;
-  if (studySet) startRound();
+function choosePeriod(id, updateUrl = false) {
+  studySet = periods.find(period => period.id === id) || periods[0];
+  document.querySelectorAll('[data-period]').forEach(link => {
+    if (link.dataset.period === studySet.id) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+  document.title = `AP Euro · ${studySet.name} — Match & remember`;
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('period', studySet.id);
+    history.pushState(null, '', url);
+    notice(`${studySet.name} ready. ${studySet.entries.length} terms from the supplied StudyMate set.`);
+  }
+  startRound();
 }
+
+function loadSet() {
+  const navigation = document.createDocumentFragment();
+  periods.forEach(period => {
+    const link = document.createElement('a');
+    link.href = `?period=${period.id}`;
+    link.dataset.period = period.id;
+    link.textContent = `${period.name} · ${period.entries.length} terms`;
+    link.addEventListener('click', event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      event.preventDefault();
+      choosePeriod(period.id, true);
+    });
+    navigation.append(link);
+  });
+  $('periods').replaceChildren(navigation);
+  choosePeriod(new URLSearchParams(window.location.search).get('period'));
+}
+window.addEventListener('popstate', () => choosePeriod(new URLSearchParams(window.location.search).get('period')));
 
 function startRound(subset) {
   if (!studySet) return;
@@ -98,35 +119,6 @@ function checkAnswers() {
   notice(`${count} of ${round.length} correct.`);
 }
 
-function openEditor() {
-  $('set-name').value = studySet?.name || '';
-  $('glossary').value = studySet ? studySet.entries.map(entry => `${entry.word}\t${entry.definition}`).join('\n') : '';
-  $('import-format').value = 'auto'; $('import-error').textContent = '';
-  $('export').disabled = !studySet;
-  $('editor').showModal();
-}
-
-$('empty-add').addEventListener('click', openEditor);
-$('edit-set').addEventListener('click', openEditor);
-$('close-editor').addEventListener('click', () => $('editor').close());
-$('editor-form').addEventListener('submit', event => {
-  event.preventDefault();
-  try {
-    const name = $('set-name').value.trim();
-    if (!name) throw new Error('Give your study set a name.');
-    const entries = parseGlossary($('glossary').value, $('import-format').value);
-    studySet = { name, entries };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(studySet)); notice('Study set saved in this browser.'); }
-    catch { notice('Your set is ready, but this browser could not save it. Use Export in the editor to keep a backup.'); }
-    $('empty').hidden = true; $('study').hidden = false; $('editor').close(); startRound();
-  } catch (error) { $('import-error').textContent = error.message; }
-});
-$('export').addEventListener('click', () => {
-  if (!studySet) return;
-  const blob = new Blob([studySet.entries.map(entry => `${entry.word}\t${entry.definition}`).join('\n')], { type: 'text/tab-separated-values;charset=utf-8' });
-  const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'ap-euro-glossary.tsv'; link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
 ['direction', 'round-size'].forEach(id => $(id).addEventListener('change', () => { notice('Started a fresh round with your new settings.'); startRound(); }));
 $('shuffle').addEventListener('click', () => { notice('New round shuffled.'); startRound(); });
 $('new-round').addEventListener('click', () => { notice('New round ready.'); startRound(); $('study').scrollIntoView({ behavior: 'instant' }); });

@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#213a35">
-  <meta name="description" content="AP European History matching practice. Paste your StudyMate terms and definitions, then test yourself with dropdown answers.">
+  <meta name="description" content="AP European History dropdown matching practice for Periods 2, 3, and 5 using the supplied StudyMate definitions.">
   <title>AP Euro — Match & remember</title>
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css?v=periods-1">
+  <script type="module" src="./app.js?v=periods-1"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to practice</a>
   <header class="topbar"><a class="brand" href="./"><span class="monogram">E</span><span>AP EURO<span class="brand-sub">THE STUDY DESK</span></span></a><span class="header-note">A little practice. A longer memory.</span></header>
   <main id="main">
-    <section class="intro"><div><p class="eyebrow">EUROPEAN HISTORY / MATCHING PRACTICE</p><h1>Know the term.<br><em>Make the connection.</em></h1><p class="lede">Your definitions on the left. The right words, one dropdown away.</p></div><div class="intro-number" aria-hidden="true"><span>READ. RECALL. REPEAT.</span><strong>01—09</strong><span>ONE COURSE. YOUR PACE.</span></div></section>
-    <section id="empty" class="empty-card" hidden><span class="section-label">START WITH YOUR STUDYMATE SET</span><h2>Your next study session starts here.</h2><p>Paste your terms and definitions to turn them into a matching round.</p><button id="empty-add" class="primary">Add a study set <span aria-hidden="true">↗</span></button><p class="privacy">Your pasted sets are saved in this browser only.</p></section>
-    <section id="study" hidden aria-label="Matching practice">
-      <div class="set-header"><div><p class="section-label">CURRENT STUDY SET</p><h2 id="set-heading"></h2><p id="set-count" class="muted"></p></div><button id="edit-set" class="secondary">Edit study set</button></div>
+    <section class="intro"><div><p class="eyebrow">EUROPEAN HISTORY / MATCHING PRACTICE</p><h1>Know the term.<br><em>Make the connection.</em></h1><p class="lede">Choose your period. Match the supplied definitions with the right terms.</p></div><div class="intro-number" aria-hidden="true"><span>READ. RECALL. REPEAT.</span><strong>02 / 03 / 05</strong><span>ONE COURSE. YOUR PACE.</span></div></section>
+    <nav id="periods" class="period-nav" aria-label="Choose a study period"></nav>
+    <section id="study" aria-label="Matching practice">
+      <div class="set-header"><div><p class="section-label">CURRENT STUDY SET</p><h2 id="set-heading"></h2><p id="set-count" class="muted"></p></div><span class="fixed-badge">StudyMate definitions</span></div>
       <div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button></div>
       <div class="practice-paper"><div class="paper-head"><span id="prompt-label">DEFINITION</span><span id="answer-label">YOUR MATCH</span></div><div id="questions"></div><div class="practice-bottom"><div class="progress-wrap"><span id="progress-text"></span><progress id="progress" max="1" value="0" aria-label="Questions answered"></progress></div><button id="check" class="primary">Check answers <span aria-hidden="true">→</span></button></div></div>
       <div id="results" class="results" hidden><div><p class="section-label">ROUND RESULTS</p><h2 id="score"></h2><p id="score-note"></p></div><div class="result-actions"><button id="retry" class="secondary">Retry missed</button><button id="reveal" class="secondary">Show answers</button><button id="new-round" class="primary">New round ↗</button></div></div>
@@ -25,7 +25,6 @@
     <p id="notice" class="notice" role="status" aria-live="polite"></p>
   </main>
   <footer><span>AP EURO <span aria-hidden="true">/</span> MATCH & REMEMBER</span><span>Made for your notes.</span></footer>
-  <dialog id="editor" aria-labelledby="editor-title"><form id="editor-form"><div class="dialog-head"><div><p class="section-label">YOUR WORDS. YOUR STUDY SET.</p><h2 id="editor-title">Add your definitions.</h2></div><button class="close" type="button" id="close-editor" aria-label="Close editor">×</button></div><label class="field">Set name<input id="set-name" maxlength="120" required placeholder="e.g. Unit 1 · Renaissance" autocomplete="off"></label><label class="field">Paste format<select id="import-format"><option value="auto">One pair per line (tab, ::, or spaced dash)</option><option value="alternating">Alternating lines: term, then definition</option></select></label><label class="field">Terms and definitions<textarea id="glossary" rows="10" required spellcheck="false" placeholder="Term :: Its definition
-Another term :: Its definition"></textarea></label><p class="format-help">Paste a two-column StudyMate list, or put <strong>Term :: Definition</strong> on each line. For terms and definitions on separate lines, choose “Alternating lines.” Your wording is kept as entered.</p><p id="import-error" class="error" role="alert"></p><div class="dialog-footer"><span>Saved on this browser.<br>Use Export to keep a backup.</span><button type="button" id="export" class="secondary">Export</button><button type="submit" class="primary">Save & practice ↗</button></div></form></dialog>
+  <noscript><p class="footnote">Enable JavaScript to use the dropdown matching practice.</p></noscript>
 </body>
 </html>
