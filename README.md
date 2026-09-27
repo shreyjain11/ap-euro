@@ -1,6 +1,6 @@
 # AP Euro matching practice
 
-A dependency-free, static matching site at euro.jainshrey.com, hosted on GitHub Pages.
+A dependency-free, static matching site at https://euro.jainshrey.com, hosted on Vercel with source in GitHub.
 
 ## Fixed study sets
 
@@ -18,6 +18,8 @@ Run `npm run dev` for the local preview and `npm test` for dataset and grading c
 
 ## Publishing
 
-GitHub Pages serves the `main` branch root. The IONOS `euro` CNAME points to `shreyjain11.github.io`; the Pages custom domain is `euro.jainshrey.com`.
+The Vercel project `ap-euro` in `shreyjain11s-projects` is connected to `shreyjain11/ap-euro`. Production updates deploy from `main`. `npm run build` runs the tests and copies only the five public assets into `dist`. The IONOS `euro` CNAME uses the project's Vercel DNS target, and Vercel manages HTTPS.
+
+Open the hosted HTTPS URL to study. Opening `index.html` directly from disk redirects to that URL because browser module imports require a web server.
 
 The previous Sites project is separate and is not used by this website.
