@@ -12,3 +12,10 @@ export function isCorrect(entry, selectedId, direction, entries) {
   if (!selected) return false;
   return direction === 'definition' ? selected.word === entry.word : selected.definition === entry.definition;
 }
+
+export function filterAnswers(entries, query, direction) {
+  const normalized = query.trim().toLocaleLowerCase();
+  const text = entry => (direction === 'definition' ? entry.word : entry.definition).toLocaleLowerCase();
+  return entries.filter(entry => text(entry).includes(normalized)).sort((a, b) =>
+    Number(text(b).startsWith(normalized)) - Number(text(a).startsWith(normalized)));
+}

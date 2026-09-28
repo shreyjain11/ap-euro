@@ -12,6 +12,8 @@ All terms and definitions are preserved from the three supplied StudyMate files 
 
 Direct links use `?period=2`, `?period=3`, and `?period=5`. Matching direction, round size, shuffled rounds, scoring, retry, and answer reveal are available.
 
+Answers use searchable dropdowns: type a few letters to filter the current round's choices, click a suggestion or press Enter to select, and use arrow keys to browse. Tab moves to the next question. Partial or unrecognized text is not saved as an answer. Search works in both matching directions.
+
 ## Development
 
 Run `npm run dev` for the local preview and `npm test` for dataset and grading checks.

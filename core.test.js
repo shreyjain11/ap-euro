@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { shuffle, isCorrect } from './core.js';
+import { shuffle, isCorrect, filterAnswers } from './core.js';
 import { periods } from './periods.js';
 
 test('exactly the three supplied periods, with complete unique pairs', () => {
@@ -29,4 +29,13 @@ test('shuffle preserves the complete selected period without changing source ord
     assert.deepEqual(after.map(e => e.id).sort(), before.map(e => e.id).sort());
     assert.deepEqual(period.entries, before);
   }
+});
+
+test('search is case-insensitive, prioritizes prefixes, and stays inside the round', () => {
+  const entries = [{id:'a',word:'John Calvin',definition:'A reformer'}, {id:'b',word:'Calvinism',definition:'A religious belief'}];
+  assert.deepEqual(filterAnswers(entries, ' CAL ', 'definition').map(e => e.id), ['b','a']);
+  assert.deepEqual(filterAnswers(entries, 'reformer', 'term').map(e => e.id), ['a']);
+  assert.deepEqual(filterAnswers(entries, 'unknown', 'definition'), []);
+  assert.deepEqual(filterAnswers(entries, '', 'definition'), entries);
+  assert.deepEqual(filterAnswers([entries[0]], 'cal', 'definition').map(e => e.id), ['a']);
 });

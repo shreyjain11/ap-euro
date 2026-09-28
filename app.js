@@ -1,4 +1,4 @@
-import { shuffle, isCorrect } from './core.js';
+import { shuffle, isCorrect, filterAnswers } from './core.js';
 import { periods } from './periods.js';
 
 const $ = id => document.getElementById(id);
@@ -71,23 +71,69 @@ function renderQuestions() {
     const label = document.createElement('label'); label.htmlFor = `answer-${entry.id}`; label.textContent = direction() === 'definition' ? entry.definition : entry.word;
     prompt.append(number, label);
     const answer = document.createElement('div'); answer.className = 'answer';
-    const select = document.createElement('select'); select.id = `answer-${entry.id}`; select.dataset.entry = entry.id;
+    const picker = document.createElement('div'); picker.className = 'answer-picker';
+    const select = document.createElement('input'); select.type = 'text'; select.id = `answer-${entry.id}`; select.dataset.entry = entry.id;
+    select.autocomplete = 'off'; select.spellcheck = false;
+    select.placeholder = direction() === 'definition' ? 'Type to find a term…' : 'Type to find a definition…';
+    select.setAttribute('role', 'combobox'); select.setAttribute('aria-autocomplete', 'list');
+    select.setAttribute('aria-expanded', 'false'); select.setAttribute('aria-controls', `choices-${entry.id}`);
     select.setAttribute('aria-describedby', `feedback-${entry.id}`);
-    const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = direction() === 'definition' ? 'Choose a term…' : 'Choose a definition…'; select.append(placeholder);
-    options.forEach(option => { const element = document.createElement('option'); element.value = option.id; element.textContent = answerText(option); select.append(element); });
+    const list = document.createElement('div'); list.id = `choices-${entry.id}`; list.className = 'answer-options'; list.hidden = true;
+    list.setAttribute('role', 'listbox'); list.setAttribute('aria-label', 'Matching answers');
+    let matches = []; let active = -1;
+    function close() { list.hidden = true; select.setAttribute('aria-expanded', 'false'); select.removeAttribute('aria-activedescendant'); active = -1; }
+    function highlight() {
+      [...list.children].forEach((item, i) => item.setAttribute('aria-selected', String(i === active)));
+      if (active >= 0) {
+        select.setAttribute('aria-activedescendant', list.children[active].id);
+        list.children[active].scrollIntoView({ block: 'nearest' });
+      } else select.removeAttribute('aria-activedescendant');
+    }
+    function choose(option) { select.value = answerText(option); record(option.id); close(); }
+    function show(query = select.value) {
+      matches = filterAnswers(options, query, direction()); active = -1; list.replaceChildren();
+      matches.forEach((option, i) => {
+        const item = document.createElement('div'); item.id = `choice-${entry.id}-${i}`;
+        item.setAttribute('role', 'option'); item.setAttribute('aria-selected', 'false'); item.textContent = answerText(option);
+        item.addEventListener('pointerdown', event => event.preventDefault());
+        item.addEventListener('click', () => choose(option)); list.append(item);
+      });
+      if (!matches.length) { const empty = document.createElement('p'); empty.className = 'no-matches'; empty.textContent = 'No matches. Try different letters.'; empty.setAttribute('role', 'status'); list.append(empty); }
+      list.hidden = false; select.setAttribute('aria-expanded', 'true'); select.removeAttribute('aria-activedescendant');
+    }
     const fullText = document.createElement('p'); fullText.className = 'chosen-definition'; fullText.hidden = true;
     const feedback = document.createElement('p'); feedback.className = 'feedback'; feedback.id = `feedback-${entry.id}`;
-    select.addEventListener('change', () => {
-      answers[entry.id] = select.value;
+    function record(id) {
+      answers[entry.id] = id;
       checked = false; revealed = false; $('results').hidden = true;
       document.querySelectorAll('.question').forEach(item => item.classList.remove('correct', 'incorrect'));
       document.querySelectorAll('.feedback').forEach(item => { item.textContent = ''; });
-      document.querySelectorAll('.answer select').forEach(item => item.removeAttribute('aria-invalid'));
-      fullText.textContent = select.value ? answerText(options.find(item => item.id === select.value)) : '';
-      fullText.hidden = direction() !== 'term' || !select.value;
+      document.querySelectorAll('.answer input').forEach(item => item.removeAttribute('aria-invalid'));
+      fullText.textContent = id ? answerText(options.find(item => item.id === id)) : '';
+      fullText.hidden = direction() !== 'term' || !id;
       updateProgress();
+    }
+    select.addEventListener('focus', () => { select.select(); show(answers[entry.id] ? '' : select.value); });
+    select.addEventListener('click', () => { if (list.hidden) show(answers[entry.id] ? '' : select.value); });
+    select.addEventListener('input', () => {
+      const exact = options.find(option => answerText(option).toLocaleLowerCase() === select.value.trim().toLocaleLowerCase());
+      record(exact?.id || ''); show();
     });
-    answer.append(select, fullText, feedback); row.append(prompt, answer); fragment.append(row);
+    select.addEventListener('keydown', event => {
+      if (event.isComposing) return;
+      if (event.key === 'Escape') { close(); return; }
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault(); if (list.hidden) show();
+        if (matches.length) { active = event.key === 'ArrowDown' ? (active + 1) % matches.length : (active <= 0 ? matches.length - 1 : active - 1); highlight(); }
+      } else if (event.key === 'Enter' && !list.hidden && matches.length) {
+        event.preventDefault(); choose(matches[active >= 0 ? active : 0]);
+      } else if (event.key === 'Tab') close();
+    });
+    select.addEventListener('blur', () => {
+      close();
+      if (select.value.trim() && !answers[entry.id]) feedback.textContent = 'Choose a suggested answer to save your match.';
+    });
+    picker.append(select, list); answer.append(picker, fullText, feedback); row.append(prompt, answer); fragment.append(row);
   });
   $('questions').replaceChildren(fragment);
   updateProgress();
