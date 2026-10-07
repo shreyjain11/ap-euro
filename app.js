@@ -1,4 +1,4 @@
-import { shuffle, isCorrect, filterAnswers } from './core.js';
+import { shuffle, isCorrect, filterAnswers, createStudySession } from './core.js';
 import { periods } from './periods.js';
 
 const $ = id => document.getElementById(id);
@@ -9,6 +9,9 @@ let answers = {};
 let checked = false;
 let revealed = false;
 let grade = [];
+let session = null;
+let sessionRound = [];
+const noRepeats = () => $('repeat-mode').value === 'once';
 const direction = () => $('direction').value;
 const answerText = entry => direction() === 'definition' ? entry.word : entry.definition;
 
@@ -26,7 +29,7 @@ function choosePeriod(id, updateUrl = false) {
     history.pushState(null, '', url);
     notice(`${studySet.name} ready. ${studySet.entries.length} terms from the supplied StudyMate set.`);
   }
-  startRound();
+  resetSession();
 }
 
 function loadSet() {
@@ -48,13 +51,32 @@ function loadSet() {
 }
 window.addEventListener('popstate', () => choosePeriod(new URLSearchParams(window.location.search).get('period')));
 
+function resetSession() {
+  session = createStudySession(studySet.entries, Number($('round-size').value));
+  sessionRound = [];
+  startRound();
+}
+
+function updateSessionProgress() {
+  $('session-progress').hidden = !noRepeats();
+  if (!noRepeats()) return;
+  const total = studySet.entries.length;
+  const completed = total - session.remaining - sessionRound.length;
+  $('session-progress').textContent = checked && !session.remaining
+    ? `Set complete · All ${total} terms covered. Restart the set to practice again.`
+    : `Round ${session.roundNumber} · ${completed} of ${total} terms covered · ${sessionRound.length} in this round · ${session.remaining} still to come`;
+  $('new-round').textContent = !session.remaining ? 'Restart set ↻' : 'Next round →';
+}
+
 function startRound(subset) {
   if (!studySet) return;
   const size = Number($('round-size').value) || studySet.entries.length;
   const blitz = size === 1;
   const previous = round[0]?.id;
   const pool = blitz ? studySet.entries.filter(entry => entry.id !== previous) : studySet.entries;
-  round = subset || shuffle(pool).slice(0, size);
+  if (subset) round = subset;
+  else if (noRepeats()) { sessionRound = session.next(); round = sessionRound; }
+  else round = shuffle(pool).slice(0, size);
   options = shuffle(blitz ? studySet.entries : round);
   answers = {}; checked = false; revealed = false; grade = [];
   $('set-heading').textContent = studySet.name;
@@ -64,6 +86,7 @@ function startRound(subset) {
   $('prompt-label').textContent = direction() === 'definition' ? 'DEFINITION' : 'TERM';
   $('answer-label').textContent = direction() === 'definition' ? 'CHOOSE THE TERM' : 'CHOOSE THE DEFINITION';
   $('results').hidden = true;
+  updateSessionProgress();
   renderQuestions();
 }
 
@@ -149,6 +172,8 @@ function updateProgress() {
   $('progress-text').textContent = `${answered} of ${round.length} answered`;
   $('progress').max = round.length; $('progress').value = answered;
   $('check').disabled = !answered;
+  if (noRepeats()) $('check').disabled = answered !== round.length;
+  updateSessionProgress();
 }
 
 function checkAnswers() {
@@ -167,12 +192,17 @@ function checkAnswers() {
   $('retry').hidden = count === round.length; $('reveal').hidden = count === round.length;
   $('reveal').disabled = false; $('reveal').textContent = 'Show answers';
   $('results').hidden = false;
+  updateSessionProgress();
   notice(`${count} of ${round.length} correct.`);
 }
 
-['direction', 'round-size'].forEach(id => $(id).addEventListener('change', () => { notice('Started a fresh round with your new settings.'); startRound(); }));
-$('shuffle').addEventListener('click', () => { notice('New round shuffled.'); startRound(); });
-$('new-round').addEventListener('click', () => { notice('New round ready.'); startRound(); $('study').scrollIntoView({ behavior: 'instant' }); });
+['direction', 'round-size', 'repeat-mode'].forEach(id => $(id).addEventListener('change', () => { notice('Started a fresh set with your new settings.'); resetSession(); }));
+$('shuffle').addEventListener('click', () => { notice(noRepeats() ? 'Current round reshuffled.' : 'New round shuffled.'); startRound(noRepeats() ? shuffle(round) : undefined); });
+$('new-round').addEventListener('click', () => {
+  if (noRepeats() && !session.remaining) { resetSession(); notice('Restarted the full set.'); }
+  else { startRound(); notice('Next round ready.'); }
+  $('study').scrollIntoView({ behavior: 'instant' });
+});
 $('check').addEventListener('click', checkAnswers);
 $('retry').addEventListener('click', () => { if (!checked) return; const missed = grade.filter(item => !item.correct).map(item => item.entry); if (missed.length) { startRound(shuffle(missed)); notice(`Retrying ${missed.length} missed ${missed.length === 1 ? 'term' : 'terms'}.`); $('study').scrollIntoView({ behavior: 'instant' }); } });
 $('reveal').addEventListener('click', () => { if (!checked || revealed) return; revealed = true; grade.filter(item => !item.correct).forEach(({ entry }) => { $(`feedback-${entry.id}`).textContent = `Answer: ${answerText(entry)}`; }); $('reveal').textContent = 'Answers shown'; $('reveal').disabled = true; });

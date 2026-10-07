@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { shuffle, isCorrect, filterAnswers } from './core.js';
+import { shuffle, isCorrect, filterAnswers, createStudySession } from './core.js';
 import { periods } from './periods.js';
 
 test('exactly the three supplied periods, with complete unique pairs', () => {
@@ -38,4 +38,20 @@ test('search is case-insensitive, prioritizes prefixes, and stays inside the rou
   assert.deepEqual(filterAnswers(entries, 'unknown', 'definition'), []);
   assert.deepEqual(filterAnswers(entries, '', 'definition'), entries);
   assert.deepEqual(filterAnswers([entries[0]], 'cal', 'definition').map(e => e.id), ['a']);
+});
+
+test('no-repeat sessions cover every term once and stop after the final short round', () => {
+  for (const period of periods) {
+    for (const size of [1, 10, 20, 0]) {
+      const session = createStudySession(period.entries, size, () => 0.5);
+      const seen = [];
+      const lengths = [];
+      while (session.remaining) { const round = session.next(); lengths.push(round.length); seen.push(...round.map(e => e.id)); }
+      assert.equal(new Set(seen).size, period.entries.length);
+      assert.deepEqual(seen.slice().sort(), period.entries.map(e => e.id).sort());
+      assert.deepEqual(session.next(), []);
+      if (period.id === '3' && size === 20) assert.deepEqual(lengths, [20, 20, 13]);
+      if (period.id === '3' && size === 10) assert.deepEqual(lengths, [10, 10, 10, 10, 10, 3]);
+    }
+  }
 });

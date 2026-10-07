@@ -19,3 +19,17 @@ export function filterAnswers(entries, query, direction) {
   return entries.filter(entry => text(entry).includes(normalized)).sort((a, b) =>
     Number(text(b).startsWith(normalized)) - Number(text(a).startsWith(normalized)));
 }
+
+export function createStudySession(entries, size, random = Math.random) {
+  const remaining = shuffle(entries, random);
+  let roundNumber = 0;
+  return {
+    get remaining() { return remaining.length; },
+    get roundNumber() { return roundNumber; },
+    next() {
+      if (!remaining.length) return [];
+      roundNumber++;
+      return remaining.splice(0, size || entries.length);
+    }
+  };
+}
