@@ -51,11 +51,16 @@ window.addEventListener('popstate', () => choosePeriod(new URLSearchParams(windo
 function startRound(subset) {
   if (!studySet) return;
   const size = Number($('round-size').value) || studySet.entries.length;
-  round = subset || shuffle(studySet.entries).slice(0, size);
-  options = shuffle(round);
+  const blitz = size === 1;
+  const previous = round[0]?.id;
+  const pool = blitz ? studySet.entries.filter(entry => entry.id !== previous) : studySet.entries;
+  round = subset || shuffle(pool).slice(0, size);
+  options = shuffle(blitz ? studySet.entries : round);
   answers = {}; checked = false; revealed = false; grade = [];
   $('set-heading').textContent = studySet.name;
   $('set-count').textContent = `${studySet.entries.length} terms in your set · ${round.length} in this round`;
+  $('blitz-credit').hidden = !blitz;
+  $('new-round').textContent = blitz ? 'Next question →' : 'New round ↗';
   $('prompt-label').textContent = direction() === 'definition' ? 'DEFINITION' : 'TERM';
   $('answer-label').textContent = direction() === 'definition' ? 'CHOOSE THE TERM' : 'CHOOSE THE DEFINITION';
   $('results').hidden = true;

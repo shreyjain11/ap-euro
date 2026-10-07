@@ -8,7 +8,7 @@
   <title>AP Euro — Match & remember</title>
   <script>if (location.protocol === 'file:') location.replace('https://euro.jainshrey.com/' + location.search);</script>
   <link rel="stylesheet" href="./styles.css?v=search-1">
-  <script type="module" src="./app.js?v=search-1"></script>
+  <script type="module" src="./app.js?v=blitz-1"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to practice</a>
@@ -18,9 +18,10 @@
     <nav id="periods" class="period-nav" aria-label="Choose a study period"></nav>
     <section id="study" aria-label="Matching practice">
       <div class="set-header"><div><p class="section-label">CURRENT STUDY SET</p><h2 id="set-heading"></h2><p id="set-count" class="muted"></p></div><span class="fixed-badge">StudyMate definitions</span></div>
-      <div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button></div>
+      <div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="1">Blitz — 1 question</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button></div>
       <div class="practice-paper"><div class="paper-head"><span id="prompt-label">DEFINITION</span><span id="answer-label">YOUR MATCH</span></div><div id="questions"></div><div class="practice-bottom"><div class="progress-wrap"><span id="progress-text"></span><progress id="progress" max="1" value="0" aria-label="Questions answered"></progress></div><button id="check" class="primary">Check answers <span aria-hidden="true">→</span></button></div></div>
       <div id="results" class="results" hidden><div><p class="section-label">ROUND RESULTS</p><h2 id="score"></h2><p id="score-note"></p></div><div class="result-actions"><button id="retry" class="secondary">Retry missed</button><button id="reveal" class="secondary">Show answers</button><button id="new-round" class="primary">New round ↗</button></div></div>
+      <p id="blitz-credit" class="footnote" hidden>Blitz mode · Credit to aadav senthilkumar (braindead cr7 glazer)</p>
       <p class="footnote">Type a few letters, then click a suggestion or press Enter. Use ↑ ↓ to browse matches and Tab for the next question.</p>
     </section>
     <p id="notice" class="notice" role="status" aria-live="polite"></p>
