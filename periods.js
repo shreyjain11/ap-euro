@@ -177,7 +177,8 @@ export const periods = [
   },
   {
     "id": "3",
-    "name": "Period 3",
+    "name": "Units 3 & 4",
+    "defaultRoundSize": "0",
     "entries": [
       {
         "id": "3-1",

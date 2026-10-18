@@ -18,6 +18,7 @@ const answerText = entry => direction() === 'definition' ? entry.word : entry.de
 function notice(text) { $('notice').textContent = text; }
 function choosePeriod(id, updateUrl = false) {
   studySet = periods.find(period => period.id === id) || periods[0];
+  if (studySet.defaultRoundSize !== undefined) $('round-size').value = studySet.defaultRoundSize;
   document.querySelectorAll('[data-period]').forEach(link => {
     if (link.dataset.period === studySet.id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');

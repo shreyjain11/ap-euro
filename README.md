@@ -5,7 +5,7 @@ A dependency-free, static matching site at https://euro.jainshrey.com, hosted on
 ## Fixed study sets
 
 - Period 2: 34 terms
-- Period 3: 53 terms
+- Units 3 & 4: one combined 53-term test (opens with All terms selected; existing `?period=3` links still work)
 - Period 5: 32 terms
 
 All terms and definitions are preserved from the three supplied StudyMate files in `periods.js`. Visitors select a period and practice matching. There are no import, editing, export, or custom-set features; old browser-saved custom sets are not loaded.
