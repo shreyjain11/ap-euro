@@ -1,5 +1,6 @@
 import { shuffle, isCorrect, filterAnswers, createStudySession } from './core.js';
 import { periods } from './periods.js';
+import { harderEntries, retainedDefinitions } from './harder.js';
 
 const $ = id => document.getElementById(id);
 let studySet = null;
@@ -16,14 +17,22 @@ const direction = () => $('direction').value;
 const answerText = entry => direction() === 'definition' ? entry.word : entry.definition;
 
 function notice(text) { $('notice').textContent = text; }
-function choosePeriod(id, updateUrl = false) {
-  studySet = periods.find(period => period.id === id) || periods[0];
-  if (studySet.defaultRoundSize !== undefined) $('round-size').value = studySet.defaultRoundSize;
+function choosePeriod(id, updateUrl = false, preserveRoundSize = false) {
+  const source = periods.find(period => period.id === id) || periods[0];
+  const supportsHarder = Boolean(retainedDefinitions[source.id]);
+  const hard = supportsHarder && new URLSearchParams(location.search).get('version') === 'harder';
+  studySet = { ...source, entries: hard ? harderEntries(source) : source.entries };
+  $('definition-versions').hidden = !supportsHarder;
+  $('version-note').hidden = !supportsHarder;
+  $('version-note').textContent = hard ? 'Harder version: fewer clues, using only words from the original definitions.' : 'Original version: the complete supplied definitions.';
+  $('version-original').setAttribute('aria-pressed', String(!hard));
+  $('version-harder').setAttribute('aria-pressed', String(hard));
+  if (!preserveRoundSize && studySet.defaultRoundSize !== undefined) $('round-size').value = studySet.defaultRoundSize;
   document.querySelectorAll('[data-period]').forEach(link => {
     if (link.dataset.period === studySet.id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
-  document.title = `AP Euro · ${studySet.name} — Match & remember`;
+  document.title = `AP Euro · ${studySet.name}${hard ? ' · Harder version' : ''} — Match & remember`;
   if (updateUrl) {
     const url = new URL(window.location.href);
     url.searchParams.set('period', studySet.id);
@@ -51,6 +60,19 @@ function loadSet() {
   choosePeriod(new URLSearchParams(window.location.search).get('period'));
 }
 window.addEventListener('popstate', () => choosePeriod(new URLSearchParams(window.location.search).get('period')));
+
+for (const version of ['original', 'harder']) {
+  $(`version-${version}`).addEventListener('click', () => {
+    const url = new URL(location.href);
+    url.searchParams.set('period', studySet.id);
+    if (version === 'harder') url.searchParams.set('version', 'harder');
+    else url.searchParams.delete('version');
+    history.pushState(null, '', url);
+    // Keep the chosen round size when switching definition versions.
+    choosePeriod(studySet.id, false, true);
+    notice(`Started a fresh set with the ${version} version.`);
+  });
+}
 
 function resetSession() {
   session = createStudySession(studySet.entries, Number($('round-size').value));

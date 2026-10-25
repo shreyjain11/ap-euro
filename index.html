@@ -7,8 +7,8 @@
   <meta name="description" content="AP European History dropdown matching practice for Periods 2, 3, and 5 using the supplied StudyMate definitions.">
   <title>AP Euro — Match & remember</title>
   <script>if (location.protocol === 'file:') location.replace('https://euro.jainshrey.com/' + location.search);</script>
-  <link rel="stylesheet" href="./styles.css?v=blitz-credit-2">
-  <script type="module" src="./app.js?v=units34-1"></script>
+  <link rel="stylesheet" href="./styles.css?v=harder-1">
+  <script type="module" src="./app.js?v=harder-1"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to practice</a>
@@ -16,6 +16,8 @@
   <main id="main">
     <section class="intro"><div><p class="eyebrow">EUROPEAN HISTORY / MATCHING PRACTICE</p><h1>Know the term.<br><em>Make the connection.</em></h1><p class="lede">Choose your period. Match the supplied definitions with the right terms.</p></div><div class="intro-number" aria-hidden="true"><span>READ. RECALL. REPEAT.</span><strong>02 / 03 / 05</strong><span>ONE COURSE. YOUR PACE.</span></div></section>
     <nav id="periods" class="period-nav" aria-label="Choose a study period"></nav>
+    <nav id="definition-versions" class="version-tabs" aria-label="Definition version" hidden><button id="version-original" type="button" aria-pressed="true">Original / easier</button><button id="version-harder" type="button" aria-pressed="false">Harder version</button></nav>
+    <p id="version-note" class="muted" hidden></p>
     <section id="study" aria-label="Matching practice">
       <div class="set-header"><div><p class="section-label">CURRENT STUDY SET</p><h2 id="set-heading"></h2><p id="set-count" class="muted"></p></div><span class="fixed-badge">StudyMate definitions</span></div>
       <div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="1">Blitz — 1 question</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><label>Future rounds<select id="repeat-mode"><option value="once">No repeats — finish the set</option><option value="repeat">Allow repeats</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button></div>

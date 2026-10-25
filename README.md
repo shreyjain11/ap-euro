@@ -12,6 +12,8 @@ All terms and definitions are preserved from the three supplied StudyMate files 
 
 Direct links use `?period=2`, `?period=3`, and `?period=5`. Matching direction, round size, shuffled rounds, scoring, retry, and answer reveal are available.
 
+Units 3 & 4 and Period 5 offer Original / easier and Harder version tabs. Harder definitions retain exact, ordered fragments from the supplied definitions, removing names, dates, titles, and other identifying clues while preserving conceptual content. `harder.js` validates every fragment against its original; tests verify deletion-only changes and distinct definitions. Original definitions remain untouched. Add `&version=harder` to a period link to open the harder version directly. Switching versions starts a fresh session with the chosen round size and works in both matching directions.
+
 Answers use searchable dropdowns: type a few letters to filter the current round's choices, click a suggestion or press Enter to select, and use arrow keys to browse. Tab moves to the next question. Partial or unrecognized text is not saved as an answer. Search works in both matching directions.
 
 ## Development
@@ -20,7 +22,7 @@ Run `npm run dev` for the local preview and `npm test` for dataset and grading c
 
 ## Publishing
 
-The Vercel project `ap-euro` in `shreyjain11s-projects` is connected to `shreyjain11/ap-euro`. Production updates deploy from `main`. `npm run build` runs the tests and copies only the five public assets into `dist`. The IONOS `euro` CNAME uses the project's Vercel DNS target, and Vercel manages HTTPS.
+The Vercel project `ap-euro` in `shreyjain11s-projects` is connected to `shreyjain11/ap-euro`. Production updates deploy from `main`. `npm run build` runs the tests and copies only the six public assets into `dist`. The IONOS `euro` CNAME uses the project's Vercel DNS target, and Vercel manages HTTPS.
 
 Open the hosted HTTPS URL to study. Opening `index.html` directly from disk redirects to that URL because browser module imports require a web server.
 

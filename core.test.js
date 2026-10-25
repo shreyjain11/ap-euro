@@ -2,6 +2,29 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { shuffle, isCorrect, filterAnswers, createStudySession } from './core.js';
 import { periods } from './periods.js';
+import { harderEntries, retainedDefinitions } from './harder.js';
+
+test('harder definitions only delete original text, preserve every pair, and remain distinct', () => {
+  for (const period of periods.filter(p => retainedDefinitions[p.id])) {
+    const original = structuredClone(period.entries);
+    const hard = harderEntries(period);
+    assert.equal(hard.length, original.length);
+    assert.equal(new Set(hard.map(e => e.definition)).size, original.length);
+    hard.forEach((entry, i) => {
+      assert.equal(entry.id, original[i].id);
+      assert.equal(entry.word, original[i].word);
+      assert.ok(entry.definition.length < original[i].definition.length, entry.id);
+      // Verify exact character order, including punctuation: no added wording.
+      let cursor = 0;
+      for (const character of entry.definition.replace(/\s/g, '')) {
+        cursor = original[i].definition.indexOf(character, cursor);
+        assert.notEqual(cursor, -1, entry.id);
+        cursor++;
+      }
+    });
+    assert.deepEqual(period.entries, original);
+  }
+});
 
 test('exactly the three supplied periods, with complete unique pairs', () => {
   assert.deepEqual(periods.map(p => [p.id, p.entries.length]), [['2', 34], ['3', 53], ['5', 32]]);
