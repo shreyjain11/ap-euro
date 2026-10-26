@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#213a35">
   <meta name="description" content="AP European History dropdown matching practice for Periods 2, 3, and 5 using the supplied StudyMate definitions.">
   <title>AP Euro — Match & remember</title>
   <script>if (location.protocol === 'file:') location.replace('https://euro.jainshrey.com/' + location.search);</script>
-  <link rel="stylesheet" href="./styles.css?v=harder-1">
-  <script type="module" src="./app.js?v=harder-1"></script>
+  <link rel="stylesheet" href="./styles.css?v=iphone-1">
+  <script type="module" src="./app.js?v=iphone-1"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to practice</a>
-  <header class="topbar"><a class="brand" href="./"><span class="monogram">E</span><span>AP EURO<span class="brand-sub">THE STUDY DESK</span></span></a><span class="header-note">A little practice. A longer memory.</span></header>
+  <header class="topbar"><a class="brand" href="./"><span class="monogram">E</span><span>AP EURO<span class="brand-sub">THE STUDY DESK</span></span></a><span class="header-note">A little practice. A longer memory.</span><a class="mobile-practice mobile-only" href="#questions">Practice ↓</a></header>
   <main id="main">
     <section class="intro"><div><p class="eyebrow">EUROPEAN HISTORY / MATCHING PRACTICE</p><h1>Know the term.<br><em>Make the connection.</em></h1><p class="lede">Choose your period. Match the supplied definitions with the right terms.</p></div><div class="intro-number" aria-hidden="true"><span>READ. RECALL. REPEAT.</span><strong>02 / 03 / 05</strong><span>ONE COURSE. YOUR PACE.</span></div></section>
     <nav id="periods" class="period-nav" aria-label="Choose a study period"></nav>
@@ -20,10 +20,10 @@
     <p id="version-note" class="muted" hidden></p>
     <section id="study" aria-label="Matching practice">
       <div class="set-header"><div><p class="section-label">CURRENT STUDY SET</p><h2 id="set-heading"></h2><p id="set-count" class="muted"></p></div><span class="fixed-badge">StudyMate definitions</span></div>
-      <div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="1">Blitz — 1 question</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><label>Future rounds<select id="repeat-mode"><option value="once">No repeats — finish the set</option><option value="repeat">Allow repeats</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button></div>
+      <details id="study-settings" class="study-settings" open><summary>Study settings <span id="settings-summary"></span></summary><div class="toolbar"><label>Match direction<select id="direction"><option value="definition">Definition → term</option><option value="term">Term → definition</option></select></label><label>Round size<select id="round-size"><option value="10">10 questions</option><option value="1">Blitz — 1 question</option><option value="20">20 questions</option><option value="0">All terms</option></select></label><label>Future rounds<select id="repeat-mode"><option value="once">No repeats — finish the set</option><option value="repeat">Allow repeats</option></select></label><button id="shuffle" class="secondary">Shuffle round <span aria-hidden="true">↻</span></button><button id="settings-done" class="primary mobile-only" type="button">Start practice ↓</button></div></details>
       <p id="session-progress" class="notice" role="status"></p>
       <aside id="blitz-credit" class="blitz-credit" aria-label="Blitz mode credit" hidden><span class="blitz-credit-label">⚡ BLITZ MODE · CREDIT TO</span><strong>aadav senthilkumar</strong><span class="blitz-credit-note">(braindead cr7 glazer)</span></aside>
-      <div class="practice-paper"><div class="paper-head"><span id="prompt-label">DEFINITION</span><span id="answer-label">YOUR MATCH</span></div><div id="questions"></div><div class="practice-bottom"><div class="progress-wrap"><span id="progress-text"></span><progress id="progress" max="1" value="0" aria-label="Questions answered"></progress></div><button id="check" class="primary">Check answers <span aria-hidden="true">→</span></button></div></div>
+      <div class="practice-paper"><div class="paper-head"><span id="prompt-label">DEFINITION</span><span id="answer-label">YOUR MATCH</span></div><div id="questions"></div><div class="practice-bottom"><div class="progress-wrap"><span id="progress-text" aria-live="polite"></span><progress id="progress" max="1" value="0" aria-label="Questions answered"></progress><a class="mobile-only dock-settings" href="#periods">Study sets ↑</a></div><button id="mobile-jump" class="secondary mobile-only" type="button">Next unanswered ↓</button><button id="check" class="primary">Check answers <span aria-hidden="true">→</span></button><button id="mobile-continue" class="primary mobile-only" type="button" hidden>Next round →</button></div></div>
       <div id="results" class="results" hidden><div><p class="section-label">ROUND RESULTS</p><h2 id="score"></h2><p id="score-note"></p></div><div class="result-actions"><button id="retry" class="secondary">Retry missed</button><button id="reveal" class="secondary">Show answers</button><button id="new-round" class="primary">New round ↗</button></div></div>
       <p class="footnote">Type a few letters, then click a suggestion or press Enter. Use ↑ ↓ to browse matches and Tab for the next question.</p>
     </section>

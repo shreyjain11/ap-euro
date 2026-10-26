@@ -16,6 +16,12 @@ Units 3 & 4 and Period 5 offer Original / easier and Harder version tabs. Harder
 
 Answers use searchable dropdowns: type a few letters to filter the current round's choices, click a suggestion or press Enter to select, and use arrow keys to browse. Tab moves to the next question. Partial or unrecognized text is not saved as an answer. Search works in both matching directions.
 
+## Phone use
+
+Phone layouts have compact study-set and difficulty buttons, collapsible Study settings, and a fixed bottom bar with progress, Next unanswered, Check answers, and next-round/restart actions. Study sets in the bottom bar returns to navigation. Settings and answer fields use 16px text, controls have at least 44px tap targets, and safe-area padding accommodates the home indicator. Answer suggestions expand beneath the field, wrap long definitions, and close the keyboard after selection. The bottom bar hides when a reduced visual viewport indicates the keyboard is open.
+
+Responsive browser checks covered 320×568, 375×667, 390×844, 430×932, 844×390, and 1280×800. Checked all study sets, both definition versions and matching directions, search/no-match/tap selection, settings, 10-question grading (including 10/10), reveal, missed-answer retry, Blitz, repeats, and a complete 20/20/13 no-repeat sequence covering 53 unique terms. No horizontal overflow or console errors were found. These checks simulate viewport sizes; physical iPhone Safari and its software keyboard require device testing.
+
 ## Development
 
 Run `npm run dev` for the local preview and `npm test` for dataset and grading checks.

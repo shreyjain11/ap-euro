@@ -15,6 +15,37 @@ let sessionRound = [];
 const noRepeats = () => $('repeat-mode').value === 'once';
 const direction = () => $('direction').value;
 const answerText = entry => direction() === 'definition' ? entry.word : entry.definition;
+const phoneLayout = window.matchMedia('(max-width: 600px)');
+
+function updatePhoneViewport() {
+  const height = window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty('--suggestion-height', `${Math.max(100, Math.min(260, height * 0.4))}px`);
+  const typing = document.activeElement?.matches('.answer input');
+  document.body.classList.toggle('keyboard-open', Boolean(phoneLayout.matches && typing && window.innerHeight - height > 100));
+}
+function setSettingsLayout() {
+  $('study-settings').open = !phoneLayout.matches;
+  updatePhoneViewport();
+}
+phoneLayout.addEventListener('change', setSettingsLayout);
+window.visualViewport?.addEventListener('resize', updatePhoneViewport);
+window.addEventListener('resize', updatePhoneViewport);
+document.addEventListener('focusin', updatePhoneViewport);
+document.addEventListener('focusout', () => requestAnimationFrame(updatePhoneViewport));
+setSettingsLayout();
+$('settings-done').addEventListener('click', () => {
+  $('study-settings').open = false;
+  $('questions').scrollIntoView({ block: 'start' });
+});
+$('mobile-jump').addEventListener('click', () => {
+  if (checked) { $('results').scrollIntoView({ block: 'start' }); return; }
+  const entry = round.find(entry => !answers[entry.id]);
+  if (!entry) { $('questions').scrollIntoView({ block: 'start' }); return; }
+  const input = $(`answer-${entry.id}`);
+  input.focus({ preventScroll: true });
+  input.closest('.question').scrollIntoView({ block: 'start' });
+});
+$('mobile-continue').addEventListener('click', () => $('new-round').click());
 
 function notice(text) { $('notice').textContent = text; }
 function choosePeriod(id, updateUrl = false, preserveRoundSize = false) {
@@ -104,6 +135,7 @@ function startRound(subset) {
   answers = {}; checked = false; revealed = false; grade = [];
   $('set-heading').textContent = studySet.name;
   $('set-count').textContent = `${studySet.entries.length} terms in your set · ${round.length} in this round`;
+  $('settings-summary').textContent = `${blitz ? 'Blitz' : `${round.length} questions`} · ${direction() === 'definition' ? 'Definition → term' : 'Term → definition'} · ${noRepeats() ? 'No repeats' : 'Repeats allowed'}`;
   $('blitz-credit').hidden = !blitz;
   $('new-round').textContent = blitz ? 'Next question →' : 'New round ↗';
   $('prompt-label').textContent = direction() === 'definition' ? 'DEFINITION' : 'TERM';
@@ -125,6 +157,7 @@ function renderQuestions() {
     const picker = document.createElement('div'); picker.className = 'answer-picker';
     const select = document.createElement('input'); select.type = 'text'; select.id = `answer-${entry.id}`; select.dataset.entry = entry.id;
     select.autocomplete = 'off'; select.spellcheck = false;
+    select.autocapitalize = 'none'; select.enterKeyHint = 'done';
     select.placeholder = direction() === 'definition' ? 'Type to find a term…' : 'Type to find a definition…';
     select.setAttribute('role', 'combobox'); select.setAttribute('aria-autocomplete', 'list');
     select.setAttribute('aria-expanded', 'false'); select.setAttribute('aria-controls', `choices-${entry.id}`);
@@ -140,7 +173,10 @@ function renderQuestions() {
         list.children[active].scrollIntoView({ block: 'nearest' });
       } else select.removeAttribute('aria-activedescendant');
     }
-    function choose(option) { select.value = answerText(option); record(option.id); close(); }
+    function choose(option) {
+      select.value = answerText(option); record(option.id); close();
+      if (phoneLayout.matches) select.blur();
+    }
     function show(query = select.value) {
       matches = filterAnswers(options, query, direction()); active = -1; list.replaceChildren();
       matches.forEach((option, i) => {
@@ -192,11 +228,15 @@ function renderQuestions() {
 
 function updateProgress() {
   const answered = round.filter(entry => answers[entry.id]).length;
-  $('progress-text').textContent = `${answered} of ${round.length} answered`;
+  $('progress-text').textContent = checked ? `${grade.filter(item => item.correct).length} / ${round.length} correct` : `${answered} of ${round.length} answered`;
   $('progress').max = round.length; $('progress').value = answered;
   $('check').disabled = !answered;
   if (noRepeats()) $('check').disabled = answered !== round.length;
   updateSessionProgress();
+  document.querySelector('.practice-bottom').classList.toggle('is-checked', checked);
+  $('mobile-continue').hidden = !checked;
+  $('mobile-continue').textContent = $('new-round').textContent;
+  $('mobile-jump').textContent = checked ? 'Review answers ↑' : answered === round.length ? 'Review round ↑' : 'Next unanswered ↓';
 }
 
 function checkAnswers() {
@@ -215,8 +255,9 @@ function checkAnswers() {
   $('retry').hidden = count === round.length; $('reveal').hidden = count === round.length;
   $('reveal').disabled = false; $('reveal').textContent = 'Show answers';
   $('results').hidden = false;
-  updateSessionProgress();
+  updateProgress();
   notice(`${count} of ${round.length} correct.`);
+  if (phoneLayout.matches) $('results').scrollIntoView({ block: 'start' });
 }
 
 ['direction', 'round-size', 'repeat-mode'].forEach(id => $(id).addEventListener('change', () => { notice('Started a fresh set with your new settings.'); resetSession(); }));
