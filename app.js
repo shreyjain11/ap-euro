@@ -234,6 +234,9 @@ function updateProgress() {
   if (noRepeats()) $('check').disabled = answered !== round.length;
   updateSessionProgress();
   document.querySelector('.practice-bottom').classList.toggle('is-checked', checked);
+  const result = checked ? (grade.every(item => item.correct) ? 'correct' : 'incorrect') : 'pending';
+  $('results').dataset.result = result;
+  document.querySelector('.practice-bottom').dataset.result = result;
   $('mobile-continue').hidden = !checked;
   $('mobile-continue').textContent = $('new-round').textContent;
   $('mobile-jump').textContent = checked ? 'Review answers ↑' : answered === round.length ? 'Review round ↑' : 'Next unanswered ↓';
